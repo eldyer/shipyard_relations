@@ -1,0 +1,9 @@
+[package]
+name = "shipyard_relations"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+indexmap = "*"
+shipyard = { git = "https://github.com/leudz/shipyard" }
+petgraph = { version = "*" }
