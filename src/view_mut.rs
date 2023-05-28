@@ -207,6 +207,10 @@ where
             })
             .map(|((a, b), (_, r))| ((*a, *b), r))
     }
+
+    pub fn clear_deleted(&mut self) {
+        self.storage.deletion_data.clear();
+    }
 }
 
 impl<R> GetGraph<R> for RelationViewMut<'_, R>
