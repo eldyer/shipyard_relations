@@ -52,6 +52,7 @@ where
 {
     pub(crate) fn remove_edge_tracked(&mut self, a: EntityId, b: EntityId, current: u32) -> bool {
         if let Some(r) = self.graph.remove_edge(a, b) {
+            self.insertion_data.remove(&(a, b));
             self.deletion_data.insert((a, b), (current, r));
             true
         } else {
