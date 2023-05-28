@@ -80,7 +80,7 @@ where
     R: Relation,
 {
     fn delete(&mut self, entity: EntityId) -> bool {
-        self.storage.remove_node_tracked(entity, self.current)
+        self.storage.delete_node_tracked(entity, self.current)
     }
 }
 
@@ -128,7 +128,7 @@ where
                 .neighbors_directed(b, petgraph::Direction::Incoming)
                 .collect::<Vec<_>>()
             {
-                assert!(self.storage.remove_edge_tracked(e, b, self.current));
+                assert!(self.storage.delete_edge_tracked(e, b, self.current));
             }
         } else if R::Mode::is_exclusive_outgoing() {
             for e in self
@@ -137,7 +137,7 @@ where
                 .neighbors_directed(a, petgraph::Direction::Outgoing)
                 .collect::<Vec<_>>()
             {
-                self.storage.remove_edge_tracked(a, e, self.current);
+                self.storage.delete_edge_tracked(a, e, self.current);
             }
         }
 
@@ -162,12 +162,12 @@ where
         result
     }
 
-    pub fn remove_relation(&mut self, a: EntityId, b: EntityId) -> bool {
-        self.storage.remove_edge_tracked(a, b, self.current)
+    pub fn delete_relation(&mut self, a: EntityId, b: EntityId) -> bool {
+        self.storage.delete_edge_tracked(a, b, self.current)
     }
 
-    pub fn remove_node(&mut self, n: EntityId) -> bool {
-        self.storage.graph.remove_node(n)
+    pub fn delete_relations_with(&mut self, e: EntityId) -> bool {
+        self.storage.graph.remove_node(e)
     }
 
     pub fn is_inserted(&self, a: EntityId, b: EntityId) -> bool {

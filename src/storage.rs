@@ -42,7 +42,7 @@ where
     }
 
     fn delete(&mut self, entity: EntityId, current: u32) {
-        self.remove_node_tracked(entity, current);
+        self.delete_node_tracked(entity, current);
     }
 }
 
@@ -50,7 +50,7 @@ impl<R> RelationStorage<R>
 where
     R: Relation,
 {
-    pub(crate) fn remove_edge_tracked(&mut self, a: EntityId, b: EntityId, current: u32) -> bool {
+    pub(crate) fn delete_edge_tracked(&mut self, a: EntityId, b: EntityId, current: u32) -> bool {
         if let Some(r) = self.graph.remove_edge(a, b) {
             self.insertion_data.remove(&(a, b));
             self.deletion_data.insert((a, b), (current, r));
@@ -60,13 +60,13 @@ where
         }
     }
 
-    pub(crate) fn remove_node_tracked(&mut self, entity: EntityId, current: u32) -> bool {
+    pub(crate) fn delete_node_tracked(&mut self, entity: EntityId, current: u32) -> bool {
         for e in self
             .graph
             .neighbors_directed(entity, petgraph::Direction::Incoming)
             .collect::<Vec<_>>()
         {
-            self.remove_edge_tracked(e, entity, current);
+            self.delete_edge_tracked(e, entity, current);
         }
 
         for e in self
@@ -74,7 +74,7 @@ where
             .neighbors_directed(entity, petgraph::Direction::Outgoing)
             .collect::<Vec<_>>()
         {
-            self.remove_edge_tracked(entity, e, current);
+            self.delete_edge_tracked(entity, e, current);
         }
 
         self.graph.remove_node(entity)
