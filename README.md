@@ -7,7 +7,7 @@ This crate provides Entity Relations for [Shipyard](https://github.com/leudz/shi
 
 Relations between entities are very common in games. For example, a monster entity seeks a target entity. A container entity contains an item entity.
 
-One way to relate an entity to another is simply to store the `EntityId` of one inside a component of the other.
+One way to relate an entity to another is to store the `EntityId` of one inside a component of the other.
 
 This can lead to problems, if you don't check the entity's aliveness. For example a hierarchy that relies on components storing related entity ids might break when entities are deleted (and this case isn't properly handled).
 
@@ -30,7 +30,7 @@ This can lead to problems, if you don't check the entity's aliveness. For exampl
 
 ## Usage
 
-To define a Relation, simply implement the `Relation` trait for a struct with or without data.
+To define a Relation, implement the `Relation` trait for a struct with or without data.
 
 ```rust
 use shipyard_relations::Relation;
@@ -62,7 +62,7 @@ Note that adding the relation `(a, b, Friends)` is the same as `(b, a, Friends)`
 
 Now `a, b` are friends as well as `a, c`. With `UndirectedExclusive`, adding `a, c` would replace `a, b` (exclusiveness meaning that only one relation of this kind can exist for an entity).
 
-To access relation inside systems for example, you simply borrow `RelationView` or `RelationViewMut`:
+In order to access relations inside systems for example borrow `RelationView` or `RelationViewMut`:
 
 ```rust
 fn system(v_person: View<Person>, r_friends: RelationView<Friends>) {
@@ -75,8 +75,6 @@ fn system(v_person: View<Person>, r_friends: RelationView<Friends>) {
 ```
 
 Here we get an iterator when calling `get`, because an entity can have multiple `Friends` relations. With an *exclusive* undirected relation, we'd get an `Option` instead, because then there can only exist one at maximum.
-
-
 
 ## License
 
