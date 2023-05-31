@@ -1,5 +1,6 @@
 mod iter;
 mod relation;
+mod relation_ext;
 mod storage;
 mod view;
 mod view_mut;
@@ -9,6 +10,7 @@ pub use self::relation::{
     Directed, DirectedExclusive, DirectedExclusiveIncoming, DirectedExclusiveOutgoing, Relation,
     RelationMode, Undirected, UndirectedExclusive,
 };
+pub use self::relation_ext::RelationExt;
 pub use self::storage::RelationStorage;
 pub use self::view::RelationView;
 pub use self::view_mut::{InsertError, RelationViewMut};
