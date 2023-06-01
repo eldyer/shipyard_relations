@@ -54,9 +54,9 @@ where
 {
     fn borrow_info(info: &mut Vec<info::TypeInfo>) {
         info.push(info::TypeInfo {
-            name: type_name::<R>().into(),
+            name: type_name::<RelationStorage<R>>().into(),
             mutability: Mutability::Exclusive,
-            storage_id: TypeId::of::<R>().into(),
+            storage_id: TypeId::of::<RelationStorage<R>>().into(),
             thread_safe: true,
         });
     }
