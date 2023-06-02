@@ -1,9 +1,18 @@
 [package]
-name = "shipyard_relations"
-version = "0.1.0"
+authors = ["eldyer"]
+categories = ["data-structures", "game-development", "game-engines"]
+description = "Entity Relations for Shipyard"
 edition = "2021"
+keywords = ["ecs", "entity", "component", "relation", "graph"]
+license = "MIT OR Apache-2.0"
+name = "shipyard_relations"
+readme = "README.md"
+repository = "https://github.com/eldyer/shipyard_relations"
+version = "0.1.0"
 
 [dependencies]
-indexmap = "*"
+indexmap = "1.9.3"
+petgraph = { version = "0.6.3", default-features = false, features = [
+    "graphmap",
+] }
 shipyard = { git = "https://github.com/leudz/shipyard" }
-petgraph = { version = "*" }
