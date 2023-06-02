@@ -1,6 +1,6 @@
 [package]
 authors = ["eldyer"]
-categories = ["data-structures", "game-development", "game-engines"]
+categories = ["data-structures", "game-development"]
 description = "Entity Relations for Shipyard"
 edition = "2021"
 keywords = ["ecs", "entity", "component", "relation", "graph"]
