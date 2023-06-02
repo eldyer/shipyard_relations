@@ -2,6 +2,7 @@ use shipyard::{AllStorages, EntityId, World};
 
 use crate::{InsertError, Relation, RelationViewMut};
 
+/// Extension trait for adding relations using `shipyard::World` or `shipyard::AllStorages`.
 pub trait RelationExt {
     fn add_relation<R>(&mut self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
     where

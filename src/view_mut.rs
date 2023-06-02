@@ -13,6 +13,7 @@ use shipyard::*;
 
 use crate::{relation_mode::RelationMode, storage::RelationStorage, GetRelation, Relation};
 
+/// Exclusive view over a relation storage.
 pub struct RelationViewMut<'a, R>
 where
     R: Relation,
@@ -84,6 +85,7 @@ where
     }
 }
 
+/// Error returned by `RelationViewMut::insert`.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum InsertError {
     CycleDetected,
@@ -95,7 +97,7 @@ impl core::fmt::Debug for InsertError {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
         match self {
             InsertError::CycleDetected => {
-                f.write_str("Tried to insert a relation that would cause a cyclic graph.")
+                f.write_str("Insertion would cause a cycle while `RelationMode` is set to acyclic.")
             }
         }
     }

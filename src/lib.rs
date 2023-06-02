@@ -1,6 +1,10 @@
+//! Shipyard Relations provides Entity Relations for [Shipyard](https://github.com/leudz/shipyard).
+
+/// Iterator types and trait.
 pub mod iter;
 mod relation;
 mod relation_ext;
+/// Modes to control directedness and exclusiveness of a relation type.
 pub mod relation_mode;
 mod storage;
 mod view;

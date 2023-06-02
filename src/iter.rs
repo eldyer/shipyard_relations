@@ -8,6 +8,7 @@ use shipyard::*;
 
 use crate::{relation_mode::RelationMode, Relation};
 
+/// Provides iterators for traversing relations depth or breadth first.
 pub trait RelationsIter<R>
 where
     R: Relation,

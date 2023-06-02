@@ -6,12 +6,14 @@ use crate::{
     relation_mode::RelationMode,
 };
 
+/// Indicates that a `struct` or `enum` is used as a relation type.
 pub trait Relation: Send + Sync + 'static + Sized {
     type Mode: RelationMode + Send + Sync + 'static;
 
     const ACYCLIC: bool = true;
 }
 
+/// Used to retrieve various information from a relation view.
 pub trait GetRelation<R>
 where
     R: Relation,

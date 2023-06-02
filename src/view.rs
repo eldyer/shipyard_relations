@@ -5,6 +5,7 @@ use shipyard::*;
 
 use crate::{relation_mode::RelationMode, storage::RelationStorage, GetRelation, Relation};
 
+/// Shared view over a relation storage.
 pub struct RelationView<'a, R>
 where
     R: Relation,
