@@ -213,6 +213,10 @@ where
     pub fn clear_deleted(&mut self) {
         self.storage.deletion_data.clear();
     }
+
+    pub fn relation_mut(&mut self, a: EntityId, b: EntityId) -> Option<&mut R> {
+        self.storage.graph.edge_weight_mut(a, b)
+    }
 }
 
 impl<R> GetRelation<R> for RelationViewMut<'_, R>
