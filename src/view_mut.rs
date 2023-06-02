@@ -11,7 +11,7 @@ use petgraph::{
 };
 use shipyard::*;
 
-use crate::{GetGraph, Relation, RelationMode, RelationStorage};
+use crate::{storage::RelationStorage, GetRelation, Relation, RelationMode};
 
 pub struct RelationViewMut<'a, R>
 where
@@ -213,7 +213,7 @@ where
     }
 }
 
-impl<R> GetGraph<R> for RelationViewMut<'_, R>
+impl<R> GetRelation<R> for RelationViewMut<'_, R>
 where
     R: Relation,
 {
@@ -222,7 +222,7 @@ where
     }
 }
 
-impl<'a, R> GetGraph<R> for &'a RelationViewMut<'_, R>
+impl<'a, R> GetRelation<R> for &'a RelationViewMut<'_, R>
 where
     R: Relation,
 {
@@ -231,7 +231,7 @@ where
     }
 }
 
-impl<'a, R> GetGraph<R> for &'a mut RelationViewMut<'_, R>
+impl<'a, R> GetRelation<R> for &'a mut RelationViewMut<'_, R>
 where
     R: Relation,
 {

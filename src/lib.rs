@@ -1,67 +1,27 @@
 pub mod iter;
-pub mod relation;
+mod relation;
 mod relation_ext;
+pub mod relation_mode;
 mod storage;
 mod view;
 mod view_mut;
 
-use self::iter::{BreadthFirstIter, DepthFirstIter};
-use self::storage::RelationStorage;
-
 #[doc(inline)]
 pub use self::iter::RelationsIter;
-#[doc(inline)]
-pub use self::relation::{Relation, RelationMode};
+pub use self::relation::{GetRelation, Relation};
 pub use self::relation_ext::RelationExt;
+#[doc(inline)]
+pub use self::relation_mode::RelationMode;
 pub use self::view::RelationView;
 pub use self::view_mut::{InsertError, RelationViewMut};
 #[doc(hidden)]
 pub use petgraph::prelude::GraphMap;
 
-use shipyard::EntityId;
-
-pub trait GetGraph<R>
-where
-    R: Relation,
-{
-    fn graph(&self) -> &GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>;
-
-    fn get(&self, entity: EntityId) -> <<R as Relation>::Mode as RelationMode>::GetOutgoing<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_outgoing(self.graph(), entity)
-    }
-
-    fn get_incoming(
-        &self,
-        entity: EntityId,
-    ) -> <<R as Relation>::Mode as RelationMode>::GetIncoming<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_incoming(self.graph(), entity)
-    }
-
-    fn get_outgoing(
-        &self,
-        entity: EntityId,
-    ) -> <<R as Relation>::Mode as RelationMode>::GetOutgoing<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_outgoing(self.graph(), entity)
-    }
-
-    fn relation(&self, a: EntityId, b: EntityId) -> Option<&R> {
-        self.graph().edge_weight(a, b)
-    }
-
-    fn visit_depth_first(&self, entity: EntityId) -> DepthFirstIter<'_, R> {
-        DepthFirstIter::new(self.graph(), entity)
-    }
-
-    fn visit_breadth_first(&self, entity: EntityId) -> BreadthFirstIter<'_, R> {
-        BreadthFirstIter::new(self.graph(), entity)
-    }
-}
-
 #[test]
 fn test_undirected_cyclic() {
     use shipyard::*;
 
-    use crate::{relation::Undirected, Relation, RelationViewMut};
+    use crate::{relation_mode::Undirected, Relation, RelationViewMut};
 
     #[derive(Debug)]
     struct Foo;

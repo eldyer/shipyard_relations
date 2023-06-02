@@ -3,7 +3,7 @@ use std::any::{type_name, TypeId};
 use petgraph::prelude::GraphMap;
 use shipyard::*;
 
-use crate::{GetGraph, Relation, RelationMode, RelationStorage};
+use crate::{storage::RelationStorage, GetRelation, Relation, RelationMode};
 
 pub struct RelationView<'a, R>
 where
@@ -110,7 +110,7 @@ where
     }
 }
 
-impl<R> GetGraph<R> for RelationView<'_, R>
+impl<R> GetRelation<R> for RelationView<'_, R>
 where
     R: Relation,
 {
@@ -119,7 +119,7 @@ where
     }
 }
 
-impl<R> GetGraph<R> for &RelationView<'_, R>
+impl<R> GetRelation<R> for &RelationView<'_, R>
 where
     R: Relation,
 {
