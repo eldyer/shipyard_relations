@@ -1,19 +1,21 @@
-mod iter;
-mod relation;
+pub mod iter;
+pub mod relation;
 mod relation_ext;
 mod storage;
 mod view;
 mod view_mut;
 
-pub use self::iter::{BreadthFirstIter, DepthFirstIter, RelationsIter};
-pub use self::relation::{
-    Directed, DirectedExclusive, DirectedExclusiveIncoming, DirectedExclusiveOutgoing, Relation,
-    RelationMode, Undirected, UndirectedExclusive,
-};
+use self::iter::{BreadthFirstIter, DepthFirstIter};
+use self::storage::RelationStorage;
+
+#[doc(inline)]
+pub use self::iter::RelationsIter;
+#[doc(inline)]
+pub use self::relation::{Relation, RelationMode};
 pub use self::relation_ext::RelationExt;
-pub use self::storage::RelationStorage;
 pub use self::view::RelationView;
 pub use self::view_mut::{InsertError, RelationViewMut};
+#[doc(hidden)]
 pub use petgraph::prelude::GraphMap;
 
 use shipyard::EntityId;
@@ -26,10 +28,6 @@ where
 
     fn get(&self, entity: EntityId) -> <<R as Relation>::Mode as RelationMode>::GetOutgoing<'_, R> {
         <<R as Relation>::Mode as RelationMode>::get_outgoing(self.graph(), entity)
-    }
-
-    fn relation(&self, a: EntityId, b: EntityId) -> Option<&R> {
-        self.graph().edge_weight(a, b)
     }
 
     fn get_incoming(
@@ -46,6 +44,10 @@ where
         <<R as Relation>::Mode as RelationMode>::get_outgoing(self.graph(), entity)
     }
 
+    fn relation(&self, a: EntityId, b: EntityId) -> Option<&R> {
+        self.graph().edge_weight(a, b)
+    }
+
     fn visit_depth_first(&self, entity: EntityId) -> DepthFirstIter<'_, R> {
         DepthFirstIter::new(self.graph(), entity)
     }
@@ -59,7 +61,7 @@ where
 fn test_undirected_cyclic() {
     use shipyard::*;
 
-    use crate::{Relation, RelationViewMut};
+    use crate::{relation::Undirected, Relation, RelationViewMut};
 
     #[derive(Debug)]
     struct Foo;

@@ -1,12 +1,11 @@
 use petgraph::{prelude::GraphMap, EdgeType};
 use shipyard::EntityId;
 
-pub enum Directed {}
-pub enum DirectedExclusive {}
-pub enum DirectedExclusiveIncoming {}
-pub enum DirectedExclusiveOutgoing {}
-pub enum Undirected {}
-pub enum UndirectedExclusive {}
+pub trait Relation: Send + Sync + 'static + Sized {
+    type Mode: RelationMode + Send + Sync + 'static;
+
+    const ACYCLIC: bool = true;
+}
 
 pub trait RelationMode {
     type EdgeType: EdgeType + Send + Sync + 'static;
@@ -17,7 +16,9 @@ pub trait RelationMode {
     where
         R: 'a;
 
+    #[doc(hidden)]
     fn is_exclusive_incoming() -> bool;
+    #[doc(hidden)]
     fn is_exclusive_outgoing() -> bool;
 
     fn get<R>(
@@ -37,6 +38,13 @@ pub trait RelationMode {
         entity: EntityId,
     ) -> <Self as RelationMode>::GetOutgoing<'_, R>;
 }
+
+pub enum Directed {}
+pub enum DirectedExclusive {}
+pub enum DirectedExclusiveIncoming {}
+pub enum DirectedExclusiveOutgoing {}
+pub enum Undirected {}
+pub enum UndirectedExclusive {}
 
 impl RelationMode for Directed {
     type EdgeType = petgraph::Directed;
@@ -271,10 +279,4 @@ impl RelationMode for UndirectedExclusive {
             .map(|(_, e, r)| (e, r))
             .next()
     }
-}
-
-pub trait Relation: Send + Sync + 'static + Sized {
-    type Mode: RelationMode + Send + Sync + 'static;
-
-    const ACYCLIC: bool = true;
 }
