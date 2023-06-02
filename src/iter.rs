@@ -6,7 +6,7 @@ use petgraph::{
 };
 use shipyard::*;
 
-use crate::{Relation, RelationMode};
+use crate::{relation_mode::RelationMode, Relation};
 
 pub trait RelationsIter<R>
 where

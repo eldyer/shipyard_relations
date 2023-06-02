@@ -2,7 +2,7 @@ use indexmap::IndexMap;
 use petgraph::prelude::GraphMap;
 use shipyard::*;
 
-use crate::{Relation, RelationMode};
+use crate::{relation_mode::RelationMode, Relation};
 
 pub(crate) struct RelationStorage<R>
 where

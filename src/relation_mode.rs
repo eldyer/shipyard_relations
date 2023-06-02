@@ -1,6 +1,7 @@
 use petgraph::{prelude::GraphMap, EdgeType};
 use shipyard::EntityId;
 
+#[doc(hidden)]
 pub trait RelationMode {
     type EdgeType: EdgeType + Send + Sync + 'static;
     type GetIncoming<'a, R>
@@ -10,9 +11,7 @@ pub trait RelationMode {
     where
         R: 'a;
 
-    #[doc(hidden)]
     fn is_exclusive_incoming() -> bool;
-    #[doc(hidden)]
     fn is_exclusive_outgoing() -> bool;
 
     fn get<R>(

@@ -3,7 +3,7 @@ use std::any::{type_name, TypeId};
 use petgraph::prelude::GraphMap;
 use shipyard::*;
 
-use crate::{storage::RelationStorage, GetRelation, Relation, RelationMode};
+use crate::{relation_mode::RelationMode, storage::RelationStorage, GetRelation, Relation};
 
 pub struct RelationView<'a, R>
 where

@@ -11,7 +11,7 @@ use petgraph::{
 };
 use shipyard::*;
 
-use crate::{storage::RelationStorage, GetRelation, Relation, RelationMode};
+use crate::{relation_mode::RelationMode, storage::RelationStorage, GetRelation, Relation};
 
 pub struct RelationViewMut<'a, R>
 where

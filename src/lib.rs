@@ -10,8 +10,6 @@ mod view_mut;
 pub use self::iter::RelationsIter;
 pub use self::relation::{GetRelation, Relation};
 pub use self::relation_ext::RelationExt;
-#[doc(inline)]
-pub use self::relation_mode::RelationMode;
 pub use self::view::RelationView;
 pub use self::view_mut::{InsertError, RelationViewMut};
 #[doc(hidden)]

@@ -3,7 +3,7 @@ use shipyard::EntityId;
 
 use crate::{
     iter::{BreadthFirstIter, DepthFirstIter},
-    RelationMode,
+    relation_mode::RelationMode,
 };
 
 pub trait Relation: Send + Sync + 'static + Sized {
