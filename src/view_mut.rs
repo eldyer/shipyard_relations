@@ -173,12 +173,21 @@ where
     }
 
     pub fn is_inserted(&self, a: EntityId, b: EntityId) -> bool {
-        self.storage
-            .insertion_data
-            .get(&(a, b))
-            .map_or(false, |timestamp| {
-                is_track_within_bounds(*timestamp, self.last_insertion, self.current)
-            })
+        self.storage.insertion_data.get(&(a, b)).map_or_else(
+            || {
+                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
+                    self.storage
+                        .insertion_data
+                        .get(&(b, a))
+                        .map_or(false, |timestamp| {
+                            is_track_within_bounds(*timestamp, self.last_insertion, self.current)
+                        })
+                } else {
+                    false
+                }
+            },
+            |timestamp| is_track_within_bounds(*timestamp, self.last_insertion, self.current),
+        )
     }
 
     pub fn inserted(&self) -> impl Iterator<Item = (EntityId, EntityId)> + '_ {
@@ -192,12 +201,21 @@ where
     }
 
     pub fn is_deleted(&self, a: EntityId, b: EntityId) -> bool {
-        self.storage
-            .deletion_data
-            .get(&(a, b))
-            .map_or(false, |timestamp| {
-                is_track_within_bounds(timestamp.0, self.last_deletion, self.current)
-            })
+        self.storage.deletion_data.get(&(a, b)).map_or_else(
+            || {
+                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
+                    self.storage
+                        .deletion_data
+                        .get(&(b, a))
+                        .map_or(false, |timestamp| {
+                            is_track_within_bounds(timestamp.0, self.last_deletion, self.current)
+                        })
+                } else {
+                    false
+                }
+            },
+            |timestamp| is_track_within_bounds(timestamp.0, self.last_deletion, self.current),
+        )
     }
 
     pub fn deleted(&self) -> impl Iterator<Item = ((EntityId, EntityId), &R)> + '_ {
