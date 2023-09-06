@@ -6,7 +6,6 @@ use std::{
 
 use petgraph::{
     algo::{is_cyclic_directed, is_cyclic_undirected},
-    prelude::GraphMap,
     EdgeType,
 };
 use shipyard::*;
@@ -172,62 +171,6 @@ where
         self.storage.graph.remove_node(e)
     }
 
-    pub fn is_inserted(&self, a: EntityId, b: EntityId) -> bool {
-        self.storage.insertion_data.get(&(a, b)).map_or_else(
-            || {
-                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
-                    self.storage
-                        .insertion_data
-                        .get(&(b, a))
-                        .map_or(false, |timestamp| {
-                            is_track_within_bounds(*timestamp, self.last_insertion, self.current)
-                        })
-                } else {
-                    false
-                }
-            },
-            |timestamp| is_track_within_bounds(*timestamp, self.last_insertion, self.current),
-        )
-    }
-
-    pub fn inserted(&self) -> impl Iterator<Item = (EntityId, EntityId)> + '_ {
-        self.storage
-            .insertion_data
-            .iter()
-            .filter(|(_, timestamp)| {
-                is_track_within_bounds(**timestamp, self.last_insertion, self.current)
-            })
-            .map(|((a, b), _)| (*a, *b))
-    }
-
-    pub fn is_deleted(&self, a: EntityId, b: EntityId) -> bool {
-        self.storage.deletion_data.get(&(a, b)).map_or_else(
-            || {
-                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
-                    self.storage
-                        .deletion_data
-                        .get(&(b, a))
-                        .map_or(false, |timestamp| {
-                            is_track_within_bounds(timestamp.0, self.last_deletion, self.current)
-                        })
-                } else {
-                    false
-                }
-            },
-            |timestamp| is_track_within_bounds(timestamp.0, self.last_deletion, self.current),
-        )
-    }
-
-    pub fn deleted(&self) -> impl Iterator<Item = ((EntityId, EntityId), &R)> + '_ {
-        self.storage
-            .deletion_data
-            .iter()
-            .filter(|(_, timestamp)| {
-                is_track_within_bounds(timestamp.0, self.last_deletion, self.current)
-            })
-            .map(|((a, b), (_, r))| ((*a, *b), r))
-    }
-
     pub fn clear_deleted(&mut self) {
         self.storage.deletion_data.clear();
     }
@@ -241,8 +184,17 @@ impl<R> GetRelation<R> for RelationViewMut<'_, R>
 where
     R: Relation,
 {
-    fn graph(&self) -> &GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType> {
-        &self.storage.graph
+    fn storage(&self) -> &RelationStorage<R> {
+        &self.storage
+    }
+    fn last_insertion(&self) -> u32 {
+        self.last_insertion
+    }
+    fn last_deletion(&self) -> u32 {
+        self.last_deletion
+    }
+    fn current(&self) -> u32 {
+        self.current
     }
 }
 
@@ -250,8 +202,17 @@ impl<'a, R> GetRelation<R> for &'a RelationViewMut<'_, R>
 where
     R: Relation,
 {
-    fn graph(&self) -> &GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType> {
-        &self.storage.graph
+    fn storage(&self) -> &RelationStorage<R> {
+        &self.storage
+    }
+    fn last_insertion(&self) -> u32 {
+        self.last_insertion
+    }
+    fn last_deletion(&self) -> u32 {
+        self.last_deletion
+    }
+    fn current(&self) -> u32 {
+        self.current
     }
 }
 
@@ -259,7 +220,16 @@ impl<'a, R> GetRelation<R> for &'a mut RelationViewMut<'_, R>
 where
     R: Relation,
 {
-    fn graph(&self) -> &GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType> {
-        &self.storage.graph
+    fn storage(&self) -> &RelationStorage<R> {
+        &self.storage
+    }
+    fn last_insertion(&self) -> u32 {
+        self.last_insertion
+    }
+    fn last_deletion(&self) -> u32 {
+        self.last_deletion
+    }
+    fn current(&self) -> u32 {
+        self.current
     }
 }

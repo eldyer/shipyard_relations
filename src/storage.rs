@@ -4,7 +4,7 @@ use shipyard::*;
 
 use crate::{relation_mode::RelationMode, Relation};
 
-pub(crate) struct RelationStorage<R>
+pub struct RelationStorage<R>
 where
     R: Relation,
 {
