@@ -185,7 +185,7 @@ where
     R: Relation,
 {
     fn storage(&self) -> &RelationStorage<R> {
-        &self.storage
+        self.storage
     }
     fn last_insertion(&self) -> u32 {
         self.last_insertion
@@ -203,7 +203,7 @@ where
     R: Relation,
 {
     fn storage(&self) -> &RelationStorage<R> {
-        &self.storage
+        self.storage
     }
     fn last_insertion(&self) -> u32 {
         self.last_insertion
@@ -221,7 +221,7 @@ where
     R: Relation,
 {
     fn storage(&self) -> &RelationStorage<R> {
-        &self.storage
+        self.storage
     }
     fn last_insertion(&self) -> u32 {
         self.last_insertion
