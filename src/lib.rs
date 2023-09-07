@@ -12,10 +12,12 @@ mod view_mut;
 
 #[doc(inline)]
 pub use self::iter::RelationsIter;
-pub use self::relation::{GetRelation, Relation};
-pub use self::relation_ext::RelationExt;
-pub use self::view::RelationView;
-pub use self::view_mut::{InsertError, RelationViewMut};
+pub use self::{
+    relation::{GetRelation, Relation},
+    relation_ext::RelationExt,
+    view::RelationView,
+    view_mut::{InsertError, RelationViewMut},
+};
 #[doc(hidden)]
 pub use petgraph::prelude::GraphMap;
 

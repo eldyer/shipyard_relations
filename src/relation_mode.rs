@@ -32,21 +32,21 @@ pub trait RelationMode: sealed::Sealed {
     fn is_exclusive_outgoing() -> bool;
 
     fn get<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         Self::get_outgoing(graph, entity)
     }
 
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R>;
+    ) -> Self::GetIncoming<'_, R>;
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R>;
+    ) -> Self::GetOutgoing<'_, R>;
 }
 
 impl RelationMode for Directed {
@@ -63,9 +63,9 @@ impl RelationMode for Directed {
     }
 
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Incoming)
@@ -74,9 +74,9 @@ impl RelationMode for Directed {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Outgoing)
@@ -99,9 +99,9 @@ impl RelationMode for DirectedExclusive {
     }
 
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         graph
             .edges_directed(entity, petgraph::Direction::Incoming)
             .map(|(e, _, r)| (e, r))
@@ -109,9 +109,9 @@ impl RelationMode for DirectedExclusive {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         graph
             .edges_directed(entity, petgraph::Direction::Outgoing)
             .map(|(_, e, r)| (e, r))
@@ -133,9 +133,9 @@ impl RelationMode for DirectedExclusiveIncoming {
     }
 
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         graph
             .edges_directed(entity, petgraph::Incoming)
             .map(|(e, _, r)| (e, r))
@@ -143,9 +143,9 @@ impl RelationMode for DirectedExclusiveIncoming {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Outgoing)
@@ -168,9 +168,9 @@ impl RelationMode for DirectedExclusiveOutgoing {
     }
 
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Incoming)
@@ -179,9 +179,9 @@ impl RelationMode for DirectedExclusiveOutgoing {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         graph
             .edges_directed(entity, petgraph::Direction::Outgoing)
             .map(|(_, e, r)| (e, r))
@@ -202,21 +202,10 @@ impl RelationMode for Undirected {
         false
     }
 
-    fn get<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
-        entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
-        Box::new(graph.edges(entity).map(move |(e1, e2, r)| match entity {
-            e if e == e1 => (e2, r),
-            e if e == e2 => (e1, r),
-            _ => unreachable!(),
-        }))
-    }
-
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Incoming)
@@ -225,9 +214,9 @@ impl RelationMode for Undirected {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
+    ) -> Self::GetOutgoing<'_, R> {
         Box::new(
             graph
                 .edges_directed(entity, petgraph::Direction::Outgoing)
@@ -249,24 +238,10 @@ impl RelationMode for UndirectedExclusive {
         true
     }
 
-    fn get<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
-        entity: EntityId,
-    ) -> <Self as RelationMode>::GetOutgoing<'_, R> {
-        graph
-            .edges(entity)
-            .map(move |(e1, e2, r)| match entity {
-                e if e == e1 => (e2, r),
-                e if e == e2 => (e1, r),
-                _ => unreachable!(),
-            })
-            .next()
-    }
-
     fn get_incoming<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         graph
             .edges_directed(entity, petgraph::Direction::Incoming)
             .map(|(e, _, r)| (e, r))
@@ -274,9 +249,9 @@ impl RelationMode for UndirectedExclusive {
     }
 
     fn get_outgoing<R>(
-        graph: &GraphMap<EntityId, R, <Self as RelationMode>::EdgeType>,
+        graph: &GraphMap<EntityId, R, Self::EdgeType>,
         entity: EntityId,
-    ) -> <Self as RelationMode>::GetIncoming<'_, R> {
+    ) -> Self::GetIncoming<'_, R> {
         graph
             .edges_directed(entity, petgraph::Direction::Outgoing)
             .map(|(_, e, r)| (e, r))
