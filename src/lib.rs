@@ -124,3 +124,74 @@ fn test_undirected_cyclic() {
 
     assert_eq!(world.borrow::<UniqueView<Deleted>>().unwrap().0, vec![]);
 }
+
+#[test]
+fn test_directed() {
+    use shipyard::*;
+
+    use crate::{relation_mode::Directed, Relation, RelationViewMut};
+
+    #[derive(Debug)]
+    struct Foo;
+
+    impl Relation for Foo {
+        type Mode = Directed;
+    }
+
+    let mut world = World::new();
+
+    let e0 = world.add_entity(());
+    let e1 = world.add_entity(());
+    let e2 = world.add_entity(());
+    let e3 = world.add_entity(());
+    let e4 = world.add_entity(());
+
+    let mut r_foo = world.borrow::<RelationViewMut<Foo>>().unwrap();
+
+    r_foo.insert(e0, e1, Foo);
+    r_foo.insert(e0, e2, Foo);
+    r_foo.insert(e2, e3, Foo);
+    r_foo.insert(e3, e4, Foo);
+
+    assert_eq!(r_foo.get(e0).map(|e| e.0).collect::<Vec<_>>(), vec![e1, e2]);
+
+    assert_eq!(
+        r_foo.visit_depth_first(e0).collect::<Vec<_>>(),
+        vec![e0, e2, e3, e4, e1]
+    );
+
+    assert_eq!(
+        r_foo.visit_breadth_first(e0).collect::<Vec<_>>(),
+        vec![e0, e1, e2, e3, e4]
+    );
+
+    assert_eq!(
+        r_foo.get_outgoing_inserted(e0).collect::<Vec<_>>(),
+        vec![e1, e2]
+    );
+
+    assert_eq!(r_foo.get_incoming_inserted(e0).collect::<Vec<_>>(), vec![]);
+
+    assert_eq!(
+        r_foo.get_incoming_inserted(e3).collect::<Vec<_>>(),
+        vec![e2]
+    );
+
+    r_foo.delete(e3);
+
+    assert_eq!(
+        r_foo
+            .get_outgoing_deleted(e3)
+            .map(|e| e.0)
+            .collect::<Vec<_>>(),
+        vec![e4]
+    );
+
+    assert_eq!(
+        r_foo
+            .get_incoming_deleted(e3)
+            .map(|e| e.0)
+            .collect::<Vec<_>>(),
+        vec![e2]
+    );
+}

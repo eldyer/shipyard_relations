@@ -8,7 +8,7 @@ pub struct RelationStorage<R>
 where
     R: Relation,
 {
-    pub(crate) graph: GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>,
+    pub(crate) graph: GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
     pub(crate) last_insert: u32,
     pub(crate) insertion_data: IndexMap<(EntityId, EntityId), u32>,
     pub(crate) deletion_data: IndexMap<(EntityId, EntityId), (u32, R)>,
@@ -43,6 +43,16 @@ where
 
     fn delete(&mut self, entity: EntityId, current: u32) {
         self.delete_node_tracked(entity, current);
+    }
+
+    fn clear_all_removed_and_deleted(&mut self) {
+        self.deletion_data.clear();
+    }
+
+    fn clear_all_removed_and_deleted_older_than_timestamp(&mut self, timestamp: TrackingTimestamp) {
+        /*self.deletion_data.retain(|_, (t, _)| {
+            is_track_within_bounds(timestamp.0, t.wrapping_sub(u32::MAX / 2), *t)
+        });*/
     }
 }
 

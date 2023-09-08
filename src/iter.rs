@@ -21,7 +21,7 @@ pub struct DepthFirstIter<'a, R>
 where
     R: Relation,
 {
-    graph: &'a GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>,
+    graph: &'a GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
     dfs: Dfs<EntityId, HashSet<EntityId>>,
 }
 
@@ -41,7 +41,7 @@ where
     R: Relation,
 {
     pub fn new(
-        graph: &'a GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>,
+        graph: &'a GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
         start: EntityId,
     ) -> Self {
         DepthFirstIter {
@@ -55,7 +55,7 @@ pub struct BreadthFirstIter<'a, R>
 where
     R: Relation,
 {
-    graph: &'a GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>,
+    graph: &'a GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
     bfs: Bfs<EntityId, HashSet<EntityId>>,
 }
 
@@ -75,7 +75,7 @@ where
     R: Relation,
 {
     pub fn new(
-        graph: &'a GraphMap<EntityId, R, <<R as Relation>::Mode as RelationMode>::EdgeType>,
+        graph: &'a GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
         start: EntityId,
     ) -> Self {
         BreadthFirstIter {

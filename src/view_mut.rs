@@ -147,7 +147,7 @@ where
         let mut result = Ok(());
 
         if R::ACYCLIC {
-            if <<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
+            if <R::Mode as RelationMode>::EdgeType::is_directed() {
                 if is_cyclic_directed(&self.storage.graph) {
                     result = Err(InsertError::CycleDetected);
                 }

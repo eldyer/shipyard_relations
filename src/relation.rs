@@ -28,22 +28,101 @@ where
     #[doc(hidden)]
     fn current(&self) -> u32;
 
-    fn get(&self, entity: EntityId) -> <<R as Relation>::Mode as RelationMode>::GetOutgoing<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_outgoing(&self.storage().graph, entity)
+    fn get(&self, entity: EntityId) -> <R::Mode as RelationMode>::GetOutgoing<'_, R> {
+        <R::Mode as RelationMode>::get_outgoing(&self.storage().graph, entity)
     }
 
-    fn get_incoming(
-        &self,
-        entity: EntityId,
-    ) -> <<R as Relation>::Mode as RelationMode>::GetIncoming<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_incoming(&self.storage().graph, entity)
+    fn get_incoming(&self, entity: EntityId) -> <R::Mode as RelationMode>::GetIncoming<'_, R> {
+        <R::Mode as RelationMode>::get_incoming(&self.storage().graph, entity)
     }
 
-    fn get_outgoing(
-        &self,
+    fn get_outgoing(&self, entity: EntityId) -> <R::Mode as RelationMode>::GetOutgoing<'_, R> {
+        <R::Mode as RelationMode>::get_outgoing(&self.storage().graph, entity)
+    }
+
+    fn get_inserted(&self, entity: EntityId) -> Box<dyn Iterator<Item = EntityId> + '_> {
+        self.get_outgoing_inserted(entity)
+    }
+
+    fn get_outgoing_inserted(&self, entity: EntityId) -> Box<dyn Iterator<Item = EntityId> + '_> {
+        let iter = self.inserted();
+        if <R::Mode as RelationMode>::EdgeType::is_directed() {
+            Box::new(iter.filter_map(move |(a, b)| (a == entity).then_some(b)))
+        } else {
+            Box::new(iter.filter_map(move |(a, b)| {
+                if a == entity {
+                    Some(b)
+                } else if b == entity {
+                    Some(a)
+                } else {
+                    None
+                }
+            }))
+        }
+    }
+
+    fn get_incoming_inserted(&self, entity: EntityId) -> Box<dyn Iterator<Item = EntityId> + '_> {
+        let iter = self.inserted();
+        if <R::Mode as RelationMode>::EdgeType::is_directed() {
+            Box::new(iter.filter_map(move |(a, b)| (b == entity).then_some(a)))
+        } else {
+            Box::new(iter.filter_map(move |(a, b)| {
+                if b == entity {
+                    Some(a)
+                } else if a == entity {
+                    Some(b)
+                } else {
+                    None
+                }
+            }))
+        }
+    }
+
+    fn get_deleted<'a>(
+        &'a self,
         entity: EntityId,
-    ) -> <<R as Relation>::Mode as RelationMode>::GetOutgoing<'_, R> {
-        <<R as Relation>::Mode as RelationMode>::get_outgoing(&self.storage().graph, entity)
+    ) -> Box<dyn Iterator<Item = (EntityId, &'a R)> + 'a> {
+        self.get_outgoing_deleted(entity)
+    }
+
+    fn get_outgoing_deleted<'a>(
+        &'a self,
+        entity: EntityId,
+    ) -> Box<dyn Iterator<Item = (EntityId, &'a R)> + 'a> {
+        let iter = self.deleted();
+        if <R::Mode as RelationMode>::EdgeType::is_directed() {
+            Box::new(iter.filter_map(move |((a, b), r)| (a == entity).then_some((b, r))))
+        } else {
+            Box::new(iter.filter_map(move |((a, b), r)| {
+                if a == entity {
+                    Some((b, r))
+                } else if b == entity {
+                    Some((a, r))
+                } else {
+                    None
+                }
+            }))
+        }
+    }
+
+    fn get_incoming_deleted<'a>(
+        &'a self,
+        entity: EntityId,
+    ) -> Box<dyn Iterator<Item = (EntityId, &'a R)> + 'a> {
+        let iter = self.deleted();
+        if <R::Mode as RelationMode>::EdgeType::is_directed() {
+            Box::new(iter.filter_map(move |((a, b), r)| (b == entity).then_some((a, r))))
+        } else {
+            Box::new(iter.filter_map(move |((a, b), r)| {
+                if b == entity {
+                    Some((a, r))
+                } else if a == entity {
+                    Some((b, r))
+                } else {
+                    None
+                }
+            }))
+        }
     }
 
     fn relation(&self, a: EntityId, b: EntityId) -> Option<&R> {
@@ -53,7 +132,7 @@ where
     fn is_inserted(&self, a: EntityId, b: EntityId) -> bool {
         self.storage().insertion_data.get(&(a, b)).map_or_else(
             || {
-                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
+                if !<R::Mode as RelationMode>::EdgeType::is_directed() {
                     self.storage()
                         .insertion_data
                         .get(&(b, a))
@@ -87,7 +166,7 @@ where
     fn is_deleted(&self, a: EntityId, b: EntityId) -> bool {
         self.storage().deletion_data.get(&(a, b)).map_or_else(
             || {
-                if !<<R as Relation>::Mode as RelationMode>::EdgeType::is_directed() {
+                if !<R::Mode as RelationMode>::EdgeType::is_directed() {
                     self.storage()
                         .deletion_data
                         .get(&(b, a))
