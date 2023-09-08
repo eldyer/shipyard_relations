@@ -60,6 +60,10 @@ impl<R> RelationStorage<R>
 where
     R: Relation,
 {
+    pub fn graph(&self) -> &GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType> {
+        &self.graph
+    }
+
     pub(crate) fn delete_edge_tracked(&mut self, a: EntityId, b: EntityId, current: u32) -> bool {
         if let Some(r) = self.graph.remove_edge(a, b) {
             self.insertion_data.remove(&(a, b));
