@@ -15,6 +15,7 @@ pub use self::iter::RelationsIter;
 pub use self::{
     relation::{GetRelation, Relation},
     relation_ext::RelationExt,
+    storage::RelationStorage,
     view::RelationView,
     view_mut::{InsertError, RelationViewMut},
 };
