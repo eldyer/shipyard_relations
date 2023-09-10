@@ -129,9 +129,10 @@ where
                 .neighbors_directed(b, petgraph::Direction::Incoming)
                 .collect::<Vec<_>>()
             {
-                assert!(self.storage.delete_edge_tracked(e, b, self.current));
+                self.storage.delete_edge_tracked(e, b, self.current);
             }
-        } else if R::Mode::is_exclusive_outgoing() {
+        }
+        if R::Mode::is_exclusive_outgoing() {
             for e in self
                 .storage
                 .graph

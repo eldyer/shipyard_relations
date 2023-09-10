@@ -196,3 +196,45 @@ fn test_directed() {
         vec![e2]
     );
 }
+
+#[test]
+fn test_directed_exclusive() {
+    use shipyard::*;
+
+    use crate::{relation_mode::DirectedExclusive, Relation, RelationViewMut};
+
+    #[derive(Debug)]
+    struct Foo;
+
+    impl Relation for Foo {
+        type Mode = DirectedExclusive;
+    }
+
+    let mut world = World::new();
+
+    let e0 = world.add_entity(());
+    let e1 = world.add_entity(());
+    let e2 = world.add_entity(());
+    let e3 = world.add_entity(());
+
+    let mut r_foo = world.borrow::<RelationViewMut<Foo>>().unwrap();
+
+    r_foo.insert(e0, e1, Foo);
+    r_foo.insert(e0, e2, Foo);
+    r_foo.insert(e0, e3, Foo);
+
+    assert_eq!(r_foo.get_outgoing(e0).map(|e| e.0), Some(e3));
+
+    assert_eq!(
+        r_foo.get_outgoing_inserted(e0).collect::<Vec<_>>(),
+        vec![e3]
+    );
+
+    assert_eq!(
+        r_foo
+            .get_outgoing_deleted(e0)
+            .map(|e| e.0)
+            .collect::<Vec<_>>(),
+        vec![e1, e2]
+    );
+}
