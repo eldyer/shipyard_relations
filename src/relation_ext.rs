@@ -4,17 +4,17 @@ use crate::{InsertError, Relation, RelationViewMut};
 
 /// Extension trait for adding relations using `shipyard::World` or `shipyard::AllStorages`.
 pub trait RelationExt {
-    fn add_relation<R>(&mut self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
+    fn add_relation<R>(&self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
     where
         R: Relation;
 
-    fn add_relation_unchecked<R>(&mut self, a: EntityId, b: EntityId, relation: R)
+    fn add_relation_unchecked<R>(&self, a: EntityId, b: EntityId, relation: R)
     where
         R: Relation;
 }
 
 impl RelationExt for World {
-    fn add_relation<R>(&mut self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
+    fn add_relation<R>(&self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
     where
         R: Relation,
     {
@@ -22,7 +22,7 @@ impl RelationExt for World {
         relation_view.insert_checked(a, b, relation)
     }
 
-    fn add_relation_unchecked<R>(&mut self, a: EntityId, b: EntityId, relation: R)
+    fn add_relation_unchecked<R>(&self, a: EntityId, b: EntityId, relation: R)
     where
         R: Relation,
     {
@@ -32,7 +32,7 @@ impl RelationExt for World {
 }
 
 impl RelationExt for AllStorages {
-    fn add_relation<R>(&mut self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
+    fn add_relation<R>(&self, a: EntityId, b: EntityId, relation: R) -> Result<(), InsertError>
     where
         R: Relation,
     {
@@ -40,7 +40,7 @@ impl RelationExt for AllStorages {
         relation_view.insert_checked(a, b, relation)
     }
 
-    fn add_relation_unchecked<R>(&mut self, a: EntityId, b: EntityId, relation: R)
+    fn add_relation_unchecked<R>(&self, a: EntityId, b: EntityId, relation: R)
     where
         R: Relation,
     {
