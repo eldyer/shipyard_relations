@@ -20,9 +20,9 @@ where
     pub(crate) storage: &'a mut RelationStorage<R>,
     _borrow: Option<ExclusiveBorrow<'a>>,
     _all_borrow: Option<SharedBorrow<'a>>,
-    last_insertion: u32,
-    last_deletion: u32,
-    current: u32,
+    last_insertion: TrackingTimestamp,
+    last_deletion: TrackingTimestamp,
+    current: TrackingTimestamp,
 }
 
 impl<R> Borrow for RelationViewMut<'_, R>
@@ -35,15 +35,15 @@ where
     fn borrow<'a>(
         all_storages: &'a AllStorages,
         all_borrow: Option<SharedBorrow<'a>>,
-        last_run: Option<u32>,
-        current: u32,
+        last_run: Option<TrackingTimestamp>,
+        current: TrackingTimestamp,
     ) -> Result<Self::View<'a>, error::GetStorage> {
         let view = all_storages.custom_storage_or_insert_mut(RelationStorage::<R>::default)?;
 
         let (storage, borrow) = unsafe { ARefMut::destructure(view) };
 
         let last_insertion = last_run.unwrap_or(storage.last_insert);
-        let last_deletion = last_run.unwrap_or(current.wrapping_sub(u32::MAX / 2));
+        let last_deletion = last_run.unwrap_or(current.furthest_from());
 
         Ok(RelationViewMut {
             storage,
@@ -188,13 +188,13 @@ where
     fn storage(&self) -> &RelationStorage<R> {
         self.storage
     }
-    fn last_insertion(&self) -> u32 {
+    fn last_insertion(&self) -> TrackingTimestamp {
         self.last_insertion
     }
-    fn last_deletion(&self) -> u32 {
+    fn last_deletion(&self) -> TrackingTimestamp {
         self.last_deletion
     }
-    fn current(&self) -> u32 {
+    fn current(&self) -> TrackingTimestamp {
         self.current
     }
 }
@@ -206,13 +206,13 @@ where
     fn storage(&self) -> &RelationStorage<R> {
         self.storage
     }
-    fn last_insertion(&self) -> u32 {
+    fn last_insertion(&self) -> TrackingTimestamp {
         self.last_insertion
     }
-    fn last_deletion(&self) -> u32 {
+    fn last_deletion(&self) -> TrackingTimestamp {
         self.last_deletion
     }
-    fn current(&self) -> u32 {
+    fn current(&self) -> TrackingTimestamp {
         self.current
     }
 }
@@ -224,13 +224,13 @@ where
     fn storage(&self) -> &RelationStorage<R> {
         self.storage
     }
-    fn last_insertion(&self) -> u32 {
+    fn last_insertion(&self) -> TrackingTimestamp {
         self.last_insertion
     }
-    fn last_deletion(&self) -> u32 {
+    fn last_deletion(&self) -> TrackingTimestamp {
         self.last_deletion
     }
-    fn current(&self) -> u32 {
+    fn current(&self) -> TrackingTimestamp {
         self.current
     }
 }

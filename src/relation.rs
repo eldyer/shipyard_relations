@@ -1,5 +1,5 @@
 use petgraph::EdgeType;
-use shipyard::{is_track_within_bounds, EntityId};
+use shipyard::{EntityId, TrackingTimestamp};
 
 use crate::{
     iter::{BreadthFirstIter, DepthFirstIter},
@@ -22,11 +22,11 @@ where
     #[doc(hidden)]
     fn storage(&self) -> &RelationStorage<R>;
     #[doc(hidden)]
-    fn last_insertion(&self) -> u32;
+    fn last_insertion(&self) -> TrackingTimestamp;
     #[doc(hidden)]
-    fn last_deletion(&self) -> u32;
+    fn last_deletion(&self) -> TrackingTimestamp;
     #[doc(hidden)]
-    fn current(&self) -> u32;
+    fn current(&self) -> TrackingTimestamp;
 
     fn get(&self, entity: EntityId) -> <R::Mode as RelationMode>::GetOutgoing<'_, R> {
         <R::Mode as RelationMode>::get_outgoing(&self.storage().graph, entity)
@@ -137,17 +137,13 @@ where
                         .insertion_data
                         .get(&(b, a))
                         .map_or(false, |timestamp| {
-                            is_track_within_bounds(
-                                *timestamp,
-                                self.last_insertion(),
-                                self.current(),
-                            )
+                            timestamp.is_within(self.last_insertion(), self.current())
                         })
                 } else {
                     false
                 }
             },
-            |timestamp| is_track_within_bounds(*timestamp, self.last_insertion(), self.current()),
+            |timestamp| timestamp.is_within(self.last_insertion(), self.current()),
         )
     }
 
@@ -156,9 +152,7 @@ where
             self.storage()
                 .insertion_data
                 .iter()
-                .filter(|(_, timestamp)| {
-                    is_track_within_bounds(**timestamp, self.last_insertion(), self.current())
-                })
+                .filter(|(_, timestamp)| timestamp.is_within(self.last_insertion(), self.current()))
                 .map(|((a, b), _)| (*a, *b)),
         )
     }
@@ -171,17 +165,13 @@ where
                         .deletion_data
                         .get(&(b, a))
                         .map_or(false, |timestamp| {
-                            is_track_within_bounds(
-                                timestamp.0,
-                                self.last_deletion(),
-                                self.current(),
-                            )
+                            timestamp.0.is_within(self.last_deletion(), self.current())
                         })
                 } else {
                     false
                 }
             },
-            |timestamp| is_track_within_bounds(timestamp.0, self.last_deletion(), self.current()),
+            |timestamp| timestamp.0.is_within(self.last_deletion(), self.current()),
         )
     }
 
@@ -194,7 +184,7 @@ where
                 .deletion_data
                 .iter()
                 .filter(|(_, timestamp)| {
-                    is_track_within_bounds(timestamp.0, self.last_deletion(), self.current())
+                    timestamp.0.is_within(self.last_deletion(), self.current())
                 })
                 .map(|((a, b), (_, r))| ((*a, *b), r)),
         )

@@ -9,9 +9,9 @@ where
     R: Relation,
 {
     pub(crate) graph: GraphMap<EntityId, R, <R::Mode as RelationMode>::EdgeType>,
-    pub(crate) last_insert: u32,
-    pub(crate) insertion_data: IndexMap<(EntityId, EntityId), u32>,
-    pub(crate) deletion_data: IndexMap<(EntityId, EntityId), (u32, R)>,
+    pub(crate) last_insert: TrackingTimestamp,
+    pub(crate) insertion_data: IndexMap<(EntityId, EntityId), TrackingTimestamp>,
+    pub(crate) deletion_data: IndexMap<(EntityId, EntityId), (TrackingTimestamp, R)>,
 }
 
 impl<R> Default for RelationStorage<R>
@@ -21,7 +21,7 @@ where
     fn default() -> Self {
         Self {
             graph: GraphMap::default(),
-            last_insert: 0,
+            last_insert: TrackingTimestamp::new(0),
             insertion_data: IndexMap::new(),
             deletion_data: IndexMap::new(),
         }
@@ -41,7 +41,7 @@ where
         self.graph.node_count() == 0
     }
 
-    fn delete(&mut self, entity: EntityId, current: u32) {
+    fn delete(&mut self, entity: EntityId, current: TrackingTimestamp) {
         self.delete_node_tracked(entity, current);
     }
 
@@ -50,9 +50,8 @@ where
     }
 
     fn clear_all_removed_and_deleted_older_than_timestamp(&mut self, timestamp: TrackingTimestamp) {
-        /*self.deletion_data.retain(|_, (t, _)| {
-            is_track_within_bounds(timestamp.0, t.wrapping_sub(u32::MAX / 2), *t)
-        });*/
+        self.deletion_data
+            .retain(|_, (t, _)| timestamp.is_older_than(*t));
     }
 }
 
@@ -64,7 +63,12 @@ where
         &self.graph
     }
 
-    pub(crate) fn delete_edge_tracked(&mut self, a: EntityId, b: EntityId, current: u32) -> bool {
+    pub(crate) fn delete_edge_tracked(
+        &mut self,
+        a: EntityId,
+        b: EntityId,
+        current: TrackingTimestamp,
+    ) -> bool {
         if let Some(r) = self.graph.remove_edge(a, b) {
             self.insertion_data.remove(&(a, b));
             self.deletion_data.insert((a, b), (current, r));
@@ -74,7 +78,11 @@ where
         }
     }
 
-    pub(crate) fn delete_node_tracked(&mut self, entity: EntityId, current: u32) -> bool {
+    pub(crate) fn delete_node_tracked(
+        &mut self,
+        entity: EntityId,
+        current: TrackingTimestamp,
+    ) -> bool {
         for e in self
             .graph
             .neighbors_directed(entity, petgraph::Direction::Incoming)
@@ -94,7 +102,13 @@ where
         self.graph.remove_node(entity)
     }
 
-    pub(crate) fn insert_tracked(&mut self, a: EntityId, b: EntityId, relation: R, current: u32) {
+    pub(crate) fn insert_tracked(
+        &mut self,
+        a: EntityId,
+        b: EntityId,
+        relation: R,
+        current: TrackingTimestamp,
+    ) {
         if self.graph.add_edge(a, b, relation).is_none() {
             self.insertion_data.insert((a, b), current);
         }
