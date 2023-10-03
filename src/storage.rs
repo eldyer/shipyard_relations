@@ -14,14 +14,14 @@ where
     pub(crate) deletion_data: IndexMap<(EntityId, EntityId), (TrackingTimestamp, R)>,
 }
 
-impl<R> Default for RelationStorage<R>
+impl<R> RelationStorage<R>
 where
     R: Relation,
 {
-    fn default() -> Self {
+    pub fn new(current: TrackingTimestamp) -> Self {
         Self {
             graph: GraphMap::default(),
-            last_insert: TrackingTimestamp::new(0),
+            last_insert: current,
             insertion_data: IndexMap::new(),
             deletion_data: IndexMap::new(),
         }

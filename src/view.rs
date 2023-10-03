@@ -30,7 +30,7 @@ where
         last_run: Option<TrackingTimestamp>,
         current: TrackingTimestamp,
     ) -> Result<Self::View<'a>, error::GetStorage> {
-        let view = all_storages.custom_storage_or_insert(RelationStorage::<R>::default)?;
+        let view = all_storages.custom_storage_or_insert(|| RelationStorage::<R>::new(current))?;
 
         let (storage, borrow) = unsafe { ARef::destructure(view) };
 
